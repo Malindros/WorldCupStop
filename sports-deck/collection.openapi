@@ -1,0 +1,5642 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "SportsDeck API Docs",
+    "version": "1.0.0"
+  },
+  "paths": {
+    "/api/admin/appeals/{id}/approve": {
+      "post": {
+        "summary": "Approve a ban appeal (requires admin auth)",
+        "description": "Marks the appeal as APPROVED, lifts the associated ban and creates an unban moderation action. Requires admin authentication.",
+        "tags": [
+          "Admin",
+          "Appeals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Appeal ID to approve"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appeal approved and ban lifted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "appeal": {
+                    "id": 4,
+                    "banId": 10,
+                    "userId": 2,
+                    "message": "pls unban!!",
+                    "status": "APPROVED",
+                    "createdAt": "2026-03-03T01:29:48.354Z",
+                    "decidedAt": "2026-03-03T01:30:21.130Z",
+                    "decidedById": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid appeal id or appeal already decided"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "404": {
+            "description": "Appeal not found"
+          }
+        }
+      }
+    },
+    "/api/admin/appeals/{id}/deny": {
+      "post": {
+        "summary": "Deny a ban appeal (requires admin auth)",
+        "description": "Marks the appeal as DENIED and records a moderation action. Requires admin authentication.",
+        "tags": [
+          "Admin",
+          "Appeals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Appeal ID to deny"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appeal denied",
+            "content": {
+              "application/json": {
+                "example": {
+                  "appeal": {
+                    "id": 4,
+                    "banId": 10,
+                    "userId": 2,
+                    "message": "please unban!",
+                    "status": "DENIED",
+                    "createdAt": "2026-03-03T01:29:48.354Z",
+                    "decidedAt": "2026-03-03T01:30:21.130Z",
+                    "decidedById": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid appeal id or appeal already decided"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "404": {
+            "description": "Appeal not found"
+          }
+        }
+      }
+    },
+    "/api/admin/appeals": {
+      "get": {
+        "summary": "List ban appeals (requires admin auth)",
+        "description": "Returns ban appeals filtered by `status` query parameter. Defaults to `PENDING`. Requires admin authentication.",
+        "tags": [
+          "Admin",
+          "Appeals"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "PENDING",
+                "APPROVED",
+                "DENIED"
+              ]
+            },
+            "description": "Filter appeals by status (default PENDING)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Appeals returned",
+            "content": {
+              "application/json": {
+                "example": {
+                  "appeals": [
+                    {
+                      "id": 4,
+                      "banId": 10,
+                      "userId": 2,
+                      "message": "please unban!",
+                      "status": "PENDING",
+                      "createdAt": "2026-03-03T01:29:48.354Z",
+                      "decidedAt": null,
+                      "decidedById": null,
+                      "user": {
+                        "id": 2,
+                        "username": "homefan"
+                      },
+                      "ban": {
+                        "id": 10,
+                        "userId": 2,
+                        "reason": "no",
+                        "until": "2028-03-30T00:00:00.000Z",
+                        "liftedAt": null,
+                        "createdAt": "2026-03-03T01:15:38.180Z"
+                      }
+                    }
+                  ],
+                  "status": "PENDING"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "500": {
+            "description": "Server error while fetching appeals"
+          }
+        }
+      }
+    },
+    "/api/admin/bans": {
+      "get": {
+        "summary": "List active bans (requires admin auth)",
+        "description": "Admin-only. Returns bans that are not lifted and not expired.",
+        "tags": [
+          "Admin"
+        ],
+        "responses": {
+          "200": {
+            "description": "Active bans returned",
+            "content": {
+              "application/json": {
+                "example": {
+                  "bans": [
+                    {
+                      "id": 2,
+                      "userId": 2,
+                      "bannedById": 1,
+                      "reason": "not being nice",
+                      "until": "2028-03-30T00:00:00.000Z",
+                      "liftedAt": null,
+                      "createdAt": "2026-03-03T01:47:55.313Z",
+                      "user": {
+                        "id": 2,
+                        "username": "homefan",
+                        "isBanned": true,
+                        "banUntil": "2028-03-30T00:00:00.000Z"
+                      },
+                      "bannedBy": {
+                        "id": 1,
+                        "username": "admin"
+                      }
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "500": {
+            "description": "Server error while fetching bans"
+          }
+        }
+      }
+    },
+    "/api/admin/digests/generate": {
+      "post": {
+        "summary": "Force-generate the daily digest (requires admin auth)",
+        "description": "Generate and persist a fresh daily digest immediately. Intended for administrative use to refresh the digest on-demand. Requires admin authentication.",
+        "tags": [
+          "Digests"
+        ],
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Digest generated successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "generatedExample": {
+                    "summary": "Newly generated digest",
+                    "value": {
+                      "id": 1,
+                      "date": "2026-03-02T00:00:00.000Z",
+                      "generatedAt": "2026-03-02T02:08:11.393Z",
+                      "cached": false,
+                      "summary": "Top Discussions:\n1. \"Match Thread 1: 1\" by Metro City Lions with 8 posts...",
+                      "sections": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - admin authentication required",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "value": {
+                      "error": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while generating digest",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "serverError": {
+                    "value": {
+                      "error": "Failed to generate daily digest"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/admin/moderation-queue": {
+      "get": {
+        "summary": "List unified moderation queue for posts and threads (requires admin auth)",
+        "description": "Returns posts and threads that have open reports, each annotated with report counts and (for posts) the latest AI verdict. Supports filtering by type and sorting by AI score, report counts, or recency.",
+        "tags": [
+          "Moderation"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "sort",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "ai_score",
+                "reports",
+                "recent"
+              ]
+            },
+            "description": "Sort by highest AI score (default), most user reports, or most recent report."
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "required": false,
+            "schema": {
+              "type": "string",
+              "enum": [
+                "POST",
+                "THREAD"
+              ]
+            },
+            "description": "Filter to only posts or only threads. Omit for both."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Moderation queue fetched",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "default": {
+                    "value": {
+                      "sort": "ai_score",
+                      "items": [
+                        {
+                          "type": "POST",
+                          "targetId": 42,
+                          "target": {
+                            "id": 42,
+                            "snippet": "This is the first 200 chars of the post...",
+                            "createdAt": "2026-03-02T04:12:00.000Z",
+                            "updatedAt": "2026-03-02T04:12:00.000Z",
+                            "author": {
+                              "id": 5,
+                              "username": "fan_user"
+                            },
+                            "thread": {
+                              "id": 9,
+                              "title": "Match Thread",
+                              "slug": "match-thread"
+                            }
+                          },
+                          "openReportCount": 3,
+                          "userReportCount": 2,
+                          "autoReportCount": 1,
+                          "lastReportAt": "2026-03-02T04:15:00.000Z",
+                          "latestAiVerdict": {
+                            "id": 11,
+                            "verdict": "review",
+                            "toxicityScore": 0.9,
+                            "explanation": "Contains personal attack",
+                            "createdAt": "2026-03-02T04:13:00.000Z"
+                          }
+                        },
+                        {
+                          "type": "THREAD",
+                          "targetId": 9,
+                          "target": {
+                            "id": 9,
+                            "title": "Match Thread",
+                            "slug": "match-thread",
+                            "isClosed": false,
+                            "isHidden": false,
+                            "createdAt": "2026-03-01T10:00:00.000Z",
+                            "updatedAt": "2026-03-01T10:00:00.000Z",
+                            "author": {
+                              "id": 3,
+                              "username": "admin_user"
+                            }
+                          },
+                          "openReportCount": 1,
+                          "userReportCount": 1,
+                          "autoReportCount": 0,
+                          "lastReportAt": "2026-03-02T03:00:00.000Z",
+                          "latestAiVerdict": null
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (not an admin)"
+          }
+        }
+      }
+    },
+    "/api/admin/moderation-queue/threads/{id}": {
+      "get": {
+        "summary": "Get moderation detail for a thread (requires admin auth)",
+        "description": "Returns thread info, all reports against it (with reporter/reviewer), and a summary of posts in the thread.",
+        "tags": [
+          "Moderation"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Thread ID to inspect."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread moderation detail fetched",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "detail": {
+                    "value": {
+                      "thread": {
+                        "id": 9,
+                        "title": "Match Thread",
+                        "slug": "match-thread",
+                        "isClosed": false,
+                        "isHidden": false,
+                        "autoOpenAt": null,
+                        "autoCloseAt": null,
+                        "createdAt": "2026-03-01T10:00:00.000Z",
+                        "updatedAt": "2026-03-01T10:00:00.000Z",
+                        "author": {
+                          "id": 3,
+                          "username": "admin_user"
+                        },
+                        "match": {
+                          "id": 5,
+                          "homeTeamId": 1,
+                          "awayTeamId": 2,
+                          "startTime": "2026-03-01T15:00:00.000Z",
+                          "status": "FINISHED"
+                        },
+                        "team": null
+                      },
+                      "reports": [
+                        {
+                          "id": 30,
+                          "status": "OPEN",
+                          "reason": "Spam thread",
+                          "createdAt": "2026-03-02T03:00:00.000Z",
+                          "reviewedAt": null,
+                          "reporter": {
+                            "id": 8,
+                            "username": "mod_user"
+                          },
+                          "reviewer": null
+                        }
+                      ],
+                      "posts": [
+                        {
+                          "id": 42,
+                          "content": "Full post content",
+                          "isHidden": false,
+                          "createdAt": "2026-03-01T10:05:00.000Z",
+                          "author": {
+                            "id": 5,
+                            "username": "fan_user"
+                          }
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid thread id"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (not an admin)"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      }
+    },
+    "/api/admin/reports/{id}/resolve": {
+      "post": {
+        "summary": "Resolve a report (requires admin auth)",
+        "description": "Dismiss or action (hide) a report. When actioned, the target post/thread is hidden and the report status becomes ACTIONED. Requires admin authentication.",
+        "tags": [
+          "Admin",
+          "Reports"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Report ID to resolve"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "action": {
+                    "type": "string",
+                    "enum": [
+                      "dismiss",
+                      "hide"
+                    ]
+                  },
+                  "reason": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "action"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Report resolved",
+            "content": {
+              "application/json": {
+                "example": {
+                  "report": {
+                    "id": 2,
+                    "reporterId": 1,
+                    "targetType": "POST",
+                    "targetId": 50,
+                    "reason": "Saying mean things!",
+                    "status": "ACTIONED",
+                    "createdAt": "2026-03-03T01:45:29.734Z",
+                    "reviewedAt": "2026-03-03T01:45:41.217Z",
+                    "reviewerId": 1
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or action"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "404": {
+            "description": "Report not found"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}/ban": {
+      "post": {
+        "summary": "Ban a user (requires admin auth)",
+        "description": "Create a ban record and mark the user as banned. Optionally include an `until` date or `reportId` reference. Requires admin authentication.",
+        "tags": [
+          "Admin",
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID to ban"
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string"
+                  },
+                  "until": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "reportId": {
+                    "type": "integer"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Created ban record",
+            "content": {
+              "application/json": {
+                "example": {
+                  "ban": {
+                    "id": 1,
+                    "userId": 2,
+                    "bannedById": 1,
+                    "reason": "not being nice",
+                    "until": "2028-03-30T00:00:00.000Z",
+                    "liftedAt": null,
+                    "createdAt": "2026-03-03T01:46:49.156Z"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "404": {
+            "description": "User not found"
+          },
+          "409": {
+            "description": "User already banned"
+          }
+        }
+      }
+    },
+    "/api/admin/users/{id}/unban": {
+      "post": {
+        "summary": "Unban a user (requires admin auth)",
+        "description": "Lift bans for a user and update their banned status. Returns who performed the unban and the updated user summary. Requires admin authentication.",
+        "tags": [
+          "Admin",
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User ID to unban"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unban performed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "performedById": 1,
+                  "targetUser": {
+                    "id": 2,
+                    "isBanned": false,
+                    "banUntil": null,
+                    "banReason": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or user not banned"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (admin only)"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/auth/login": {
+      "post": {
+        "summary": "Log in with email or username and password",
+        "description": "Returns access and refresh JWTs. Use email or username in the username field.",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "username",
+                  "password"
+                ],
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "description": "Email or username"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Success; returns accessToken and refreshToken"
+          },
+          "400": {
+            "description": "Missing username or password"
+          },
+          "401": {
+            "description": "Invalid credentials"
+          }
+        }
+      }
+    },
+    "/api/auth/logout": {
+      "post": {
+        "summary": "Log out and invalidate refresh token",
+        "description": "Submit the refresh token to invalidate it. After logout, that token can no longer be used to obtain new access tokens.",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged out successfully"
+          }
+        }
+      }
+    },
+    "/api/auth/refresh": {
+      "post": {
+        "summary": "Refresh access token",
+        "description": "Exchange a valid refresh token for new access and refresh tokens. Revoked tokens are rejected.",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "refreshToken"
+                ],
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "New accessToken and refreshToken"
+          },
+          "400": {
+            "description": "Missing refresh token"
+          },
+          "401": {
+            "description": "Invalid or revoked refresh token"
+          }
+        }
+      }
+    },
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user with email and password",
+        "description": "Creates a new user account. Email required; username optional (auto-generated from email if omitted). Returns accessToken and refreshToken.",
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "properties": {
+                  "email": {
+                    "type": "string",
+                    "format": "email"
+                  },
+                  "password": {
+                    "type": "string",
+                    "minLength": 8
+                  },
+                  "username": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30,
+                    "description": "Optional; auto-generated from email if omitted"
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "description": "Optional; if omitted, set to username when provided else email local part (no suffix)"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "User created; returns user, accessToken, refreshToken"
+          },
+          "400": {
+            "description": "Invalid input or missing required fields"
+          },
+          "409": {
+            "description": "Email or username already in use"
+          }
+        }
+      }
+    },
+    "/api/bans/{id}/appeal": {
+      "post": {
+        "summary": "Submit an appeal for a ban (requires user auth)",
+        "description": "Authenticated users may submit an appeal for their own ban. Creates a pending BanAppeal record.",
+        "tags": [
+          "Appeals"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Ban ID to appeal"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "message": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "message"
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Appeal created",
+            "content": {
+              "application/json": {
+                "example": {
+                  "appeal": {
+                    "id": 1,
+                    "banId": 2,
+                    "userId": 2,
+                    "message": "please unban!",
+                    "status": "PENDING",
+                    "createdAt": "2026-03-03T01:48:43.278Z",
+                    "decidedAt": null,
+                    "decidedById": null
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "403": {
+            "description": "Forbidden (not the banned user)"
+          },
+          "404": {
+            "description": "Ban not found"
+          },
+          "409": {
+            "description": "Appeal already pending"
+          }
+        }
+      }
+    },
+    "/api/digests/today": {
+      "get": {
+        "summary": "Get today's daily digest (requires user auth)",
+        "description": "Retrieve the cached daily digest or generate a new one summarizing top discussions, recent matches, and standings moves. Requires authenticated user.",
+        "tags": [
+          "Digests"
+        ],
+        "responses": {
+          "200": {
+            "description": "Digest retrieved successfully",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object"
+                },
+                "examples": {
+                  "digestExample": {
+                    "summary": "Sample daily digest response",
+                    "value": {
+                      "id": 1,
+                      "date": "2026-03-02T00:00:00.000Z",
+                      "generatedAt": "2026-03-02T02:08:11.393Z",
+                      "cached": true,
+                      "summary": "Top Discussions:\n1. \"Match Thread 1: 1\" by Metro City Lions with 8 posts...",
+                      "sections": {}
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - authentication required",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "value": {
+                      "error": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while generating digest",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "serverError": {
+                    "value": {
+                      "error": "Failed to fetch daily digest"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/matches/{id}": {
+      "get": {
+        "summary": "Get match by ID",
+        "description": "Returns a match by its ID, including home and away team info.",
+        "tags": [
+          "Matches"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Match ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Match object"
+          },
+          "400": {
+            "description": "Invalid match id"
+          },
+          "404": {
+            "description": "Match not found"
+          }
+        }
+      }
+    },
+    "/api/matches/{id}/threads": {
+      "get": {
+        "summary": "List threads for a match",
+        "description": "Returns a list of forum threads associated with a match.",
+        "tags": [
+          "Matches"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Match ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of threads for the match"
+          },
+          "400": {
+            "description": "Invalid match id"
+          },
+          "404": {
+            "description": "Match not found"
+          },
+          "500": {
+            "description": "Failed to fetch match threads"
+          }
+        }
+      }
+    },
+    "/api/matches": {
+      "get": {
+        "summary": "List matches",
+        "description": "Returns a list of matches, optionally filtered by status, team, date, season, or matchday.",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            },
+            "description": "Filter by match status"
+          },
+          {
+            "in": "query",
+            "name": "team",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by team ID (home or away)"
+          },
+          {
+            "in": "query",
+            "name": "date",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Filter by match date (YYYY-MM-DD)"
+          },
+          {
+            "in": "query",
+            "name": "season",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by season ID"
+          },
+          {
+            "in": "query",
+            "name": "matchday",
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Filter by matchday number"
+          }
+        ],
+        "tags": [
+          "Matches"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matches"
+          }
+        }
+      }
+    },
+    "/api/me/avatar": {
+      "post": {
+        "summary": "Upload or change avatar",
+        "description": "Upload an image as profile picture. Accepts multipart/form-data with field \"file\". Replaces existing avatar.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "multipart/form-data": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "file": {
+                    "type": "string",
+                    "format": "binary"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Avatar updated; returns user with avatar URL"
+          },
+          "400": {
+            "description": "No file or invalid file type/size"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Remove avatar",
+        "description": "Removes the current user's profile picture.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Avatar removed"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/me/bans": {
+      "get": {
+        "summary": "Get the latest ban for the current user",
+        "description": "Returns the most recent ban record for the authenticated user, including whether it is still active and any pending appeal.",
+        "tags": [
+          "Account"
+        ],
+        "responses": {
+          "200": {
+            "description": "Latest ban (or null if none)"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "500": {
+            "description": "Server error while fetching ban"
+          }
+        }
+      }
+    },
+    "/api/me/feed": {
+      "get": {
+        "summary": "Get personalized activity feed (grouped)",
+        "description": "Returns a merged feed with meaningful grouping so many events on the same post/thread do not overwhelm. Posts from followed users are grouped by thread (postCount + up to 5 latest posts). Comments on the user's posts are grouped by parent post (commentCount + up to 5 latest comments). Match updates and team threads remain one item each. Requires authentication.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            },
+            "description": "Max number of feed items (groups) to return."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Feed items sorted by timestamp (newest first); post/comment activity grouped by thread or parent post."
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/me/followers/{id}": {
+      "delete": {
+        "summary": "Remove a follower",
+        "description": "Removes the follow relationship so the given user no longer follows the current user. Requires authentication.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User id of the follower to remove"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Follower removed"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "No such follower (user is not following you)"
+          }
+        }
+      }
+    },
+    "/api/me/followers": {
+      "get": {
+        "summary": "List my followers",
+        "description": "Returns users who follow the current user. Sorted by follow time (newest first). Requires authentication.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of followers with followedAt"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/me/following": {
+      "get": {
+        "summary": "List users I follow",
+        "description": "Returns users that the current user follows. Sorted by follow time (newest first). Requires authentication.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of followed users with followedAt"
+          },
+          "401": {
+            "description": "Unauthorized"
+          }
+        }
+      }
+    },
+    "/api/me": {
+      "get": {
+        "summary": "Get currently authenticated user",
+        "description": "Returns the profile of the user identified by the Bearer token.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Current user profile"
+          },
+          "401": {
+            "description": "Unauthorized (missing or invalid token)"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update current user profile",
+        "description": "Update username, displayName, and/or favorite team. All fields optional.",
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "username": {
+                    "type": "string",
+                    "minLength": 2,
+                    "maxLength": 30
+                  },
+                  "displayName": {
+                    "type": "string",
+                    "maxLength": 100
+                  },
+                  "favoriteTeamId": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated user profile"
+          },
+          "400": {
+            "description": "Validation error"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "409": {
+            "description": "Username already taken"
+          }
+        }
+      }
+    },
+    "/api/polls/{id}/close": {
+      "post": {
+        "summary": "Close poll manually",
+        "description": "Closes a poll. Allowed for poll creator or admin.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poll closed"
+          },
+          "400": {
+            "description": "Invalid poll id or poll already closed"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Poll not found"
+          }
+        }
+      }
+    },
+    "/api/polls/{id}/options/{optionId}": {
+      "patch": {
+        "summary": "Edit poll option",
+        "description": "Edits an option's label and/or metadata. Only the poll creator or an administrator may edit options. Not allowed once voting has started.",
+        "tags": [
+          "Polls"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Poll ID"
+          },
+          {
+            "in": "path",
+            "name": "optionId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Poll option ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "New option label (trimmed and sanitized)",
+                    "maxLength": 500
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Optional metadata to attach to the option (stored as JSON)"
+                  }
+                }
+              },
+              "example": {
+                "label": "Updated option label",
+                "metadata": {
+                  "color": "#ffcc00"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated poll option",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "pollId": {
+                      "type": "integer"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                },
+                "example": {
+                  "id": 13,
+                  "pollId": 7,
+                  "label": "Updated option label",
+                  "metadata": {
+                    "color": "#ffcc00"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or poll state (e.g. poll closed, no updatable fields)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Option label is required"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (not poll owner or admin)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Forbidden"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Poll or option not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Poll option not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Failed to update poll option"
+                }
+              }
+            }
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete poll option",
+        "description": "Deletes a poll option. Only the poll creator or an administrator may delete options. Not allowed once voting has started. Polls must retain at least two options.",
+        "tags": [
+          "Polls"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Poll ID"
+          },
+          {
+            "in": "path",
+            "name": "optionId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Poll option ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Option deleted",
+            "content": {
+              "application/json": {
+                "example": {
+                  "ok": true
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or poll state (e.g. cannot modify after votes, not enough options)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Poll must have at least two options"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (not poll owner or admin)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Forbidden"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Poll or option not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Poll option not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Failed to delete poll option"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polls/{id}/options": {
+      "post": {
+        "summary": "Add poll option",
+        "description": "Adds a poll option to a poll. Only the poll creator or an admin may add options, and options cannot be added once voting has started or the poll is closed.",
+        "tags": [
+          "Polls"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Poll ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "label"
+                ],
+                "properties": {
+                  "label": {
+                    "type": "string",
+                    "description": "Option label (user-visible)",
+                    "maxLength": 500
+                  },
+                  "metadata": {
+                    "type": "object",
+                    "nullable": true,
+                    "description": "Optional metadata object stored with the option"
+                  }
+                }
+              },
+              "example": {
+                "label": "Extend halftime by 5 minutes",
+                "metadata": {
+                  "emoji": "🏟️"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Poll option created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "pollId": {
+                      "type": "integer"
+                    },
+                    "label": {
+                      "type": "string"
+                    },
+                    "metadata": {
+                      "type": "object",
+                      "nullable": true
+                    }
+                  }
+                },
+                "example": {
+                  "id": 42,
+                  "pollId": 7,
+                  "label": "Extend halftime by 5 minutes",
+                  "metadata": {
+                    "emoji": "🏟️"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or poll state",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid poll id"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (not poll owner or admin)",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Forbidden"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Poll not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Poll not found"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Failed to add poll option"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/polls/{id}": {
+      "get": {
+        "summary": "Get poll details",
+        "description": "Returns poll metadata with option/vote counts.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poll details"
+          },
+          "400": {
+            "description": "Invalid poll id"
+          },
+          "404": {
+            "description": "Poll not found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Update a poll",
+        "description": "Updates a poll's question and/or deadline. Requires user authentication.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "deadline": {
+                    "type": "string",
+                    "format": "date-time"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Poll updated"
+          },
+          "400": {
+            "description": "Invalid poll id or missing poll name"
+          },
+          "403": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "Poll not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a poll",
+        "description": "Deletes a poll by ID. Requires user authentication.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poll deleted"
+          },
+          "400": {
+            "description": "Invalid poll id"
+          },
+          "404": {
+            "description": "Poll not found"
+          }
+        }
+      }
+    },
+    "/api/polls/{id}/vote": {
+      "post": {
+        "summary": "Vote in poll",
+        "description": "Cast a vote for an option in an open poll. One vote per user per poll.",
+        "tags": [
+          "Polls"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Poll ID"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "optionId"
+                ],
+                "properties": {
+                  "optionId": {
+                    "type": "integer",
+                    "description": "ID of the poll option to vote for"
+                  }
+                }
+              },
+              "example": {
+                "optionId": 13
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Vote recorded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "pollId": {
+                      "type": "integer"
+                    },
+                    "optionId": {
+                      "type": "integer"
+                    },
+                    "voterId": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "example": {
+                  "id": 101,
+                  "pollId": 7,
+                  "optionId": 13,
+                  "voterId": 55
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid input or poll closed",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid poll id"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Poll or option not found",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Poll option not found"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "User has already voted in this poll",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "You have already voted in this poll"
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Failed to cast vote"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/history": {
+      "get": {
+        "summary": "Get post content history",
+        "description": "Returns the current content and edit snapshots for a post in chronological order.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Post ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post history returned"
+          },
+          "400": {
+            "description": "Invalid post id"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "500": {
+            "description": "Failed to fetch post history"
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/replies": {
+      "get": {
+        "summary": "Get replies to post",
+        "description": "Returns replies for a specific post.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Replies returned"
+          },
+          "400": {
+            "description": "Invalid post id"
+          },
+          "404": {
+            "description": "Post not found"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create reply to post",
+        "description": "Authenticated users can create a reply to a parent post.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Reply created"
+          },
+          "400": {
+            "description": "Invalid post id or content"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Parent post not found"
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/report": {
+      "post": {
+        "summary": "Report a post (requires user auth)",
+        "description": "Submit a report for a post by id with a short reason. Requires authenticated user.",
+        "tags": [
+          "Reports"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Numeric post ID to report",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Concise reason for the report"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Report submitted successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "value": {
+                      "reportId": 2,
+                      "targetType": "POST",
+                      "targetId": 1,
+                      "status": "OPEN",
+                      "createdAt": "2026-03-02T03:20:43.977Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid id or missing reason)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid": {
+                    "value": {
+                      "error": "Invalid post id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - authentication required"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "409": {
+            "description": "Conflict - already reported",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "conflict": {
+                    "value": {
+                      "error": "You have already reported this post"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while submitting report"
+          }
+        }
+      }
+    },
+    "/api/posts/{id}": {
+      "get": {
+        "summary": "Fetch a single post by id",
+        "description": "Returns post content with author and thread info when visible.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Post ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post returned"
+          },
+          "400": {
+            "description": "Invalid post id",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidId": {
+                    "value": {
+                      "error": "Invalid post id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "500": {
+            "description": "Server error fetching post"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Edit a post (owner or admin)",
+        "description": "Requires authentication. Only the post owner or an admin may edit, and hidden/closed content is blocked for non-admins.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Post ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Post updated"
+          },
+          "400": {
+            "description": "Validation error (invalid id or missing content)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingContent": {
+                    "value": {
+                      "error": "Content is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (not owner/admin, hidden/closed, or banned)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "banned": {
+                    "value": {
+                      "error": "You are banned"
+                    }
+                  },
+                  "forbidden": {
+                    "value": {
+                      "error": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "500": {
+            "description": "Server error updating post"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a post",
+        "description": "Soft deletes a post by marking it hidden. Requires owner or admin.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Post deleted"
+          },
+          "400": {
+            "description": "Invalid post id"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Post not found"
+          },
+          "500": {
+            "description": "Failed to delete post"
+          }
+        }
+      }
+    },
+    "/api/posts/{id}/translate": {
+      "get": {
+        "summary": "Translate a post's content to English (requires user auth)",
+        "description": "AI translate a post's content to English. Optionally translate a specific historical edit instead of the current post content. You can also provide a sourceLanguage hint to improve accuracy. Requires authenticated user.\n",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Numeric post ID to translate",
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "name": "sourceLanguage",
+            "in": "query",
+            "required": false,
+            "description": "Hint language for the translator (e.g. \"es\", \"fr\", \"de\")",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "editId",
+            "in": "query",
+            "required": false,
+            "description": "Numeric ID of a historical edit to translate instead of the current post content",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Translation succeeded",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "translatedText": {
+                      "type": "string"
+                    },
+                    "cached": {
+                      "type": "boolean"
+                    },
+                    "alreadyEnglish": {
+                      "type": "boolean"
+                    },
+                    "editId": {
+                      "type": "integer"
+                    }
+                  }
+                },
+                "examples": {
+                  "translatedCurrentPost": {
+                    "summary": "Translated current post content",
+                    "value": {
+                      "translatedText": "This is the translated English content.",
+                      "cached": false,
+                      "alreadyEnglish": false
+                    }
+                  },
+                  "translatedEdit": {
+                    "summary": "Translated historical edit",
+                    "value": {
+                      "translatedText": "Translated English content from edit.",
+                      "cached": true,
+                      "alreadyEnglish": false,
+                      "editId": 123
+                    }
+                  },
+                  "alreadyEnglish": {
+                    "summary": "Post already in English",
+                    "value": {
+                      "translatedText": "Original English content.",
+                      "cached": false,
+                      "alreadyEnglish": true
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (missing/invalid id, invalid edit id)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "invalidId": {
+                    "value": {
+                      "error": "Invalid post id"
+                    }
+                  },
+                  "invalidEditId": {
+                    "value": {
+                      "error": "Invalid edit id"
+                    }
+                  },
+                  "translationFailed": {
+                    "value": {
+                      "error": "Translation failed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - authentication required",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "value": {
+                      "error": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "forbidden": {
+                    "value": {
+                      "error": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Post or edit not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "error": {
+                      "type": "string"
+                    }
+                  }
+                },
+                "examples": {
+                  "postNotFound": {
+                    "value": {
+                      "error": "Post not found"
+                    }
+                  },
+                  "editNotFound": {
+                    "value": {
+                      "error": "Post edit not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/seasons/{seasonId}/matchdays/{matchday}/matches": {
+      "get": {
+        "summary": "Get matches for a season matchday",
+        "description": "Returns all matches for a given season and matchday.",
+        "tags": [
+          "Seasons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seasonId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Season ID"
+          },
+          {
+            "in": "path",
+            "name": "matchday",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Matchday number"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matches for the matchday"
+          },
+          "400": {
+            "description": "Invalid seasonId or matchday"
+          },
+          "500": {
+            "description": "Failed to fetch matchday matches"
+          }
+        }
+      }
+    },
+    "/api/seasons/{seasonId}/matchdays": {
+      "get": {
+        "summary": "Get matchday count for a season",
+        "description": "Returns the number of matchdays for a given season.",
+        "tags": [
+          "Seasons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seasonId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Season ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Matchday count for the season"
+          },
+          "400": {
+            "description": "Invalid season id"
+          },
+          "404": {
+            "description": "Season not found"
+          },
+          "500": {
+            "description": "Failed to fetch matchdays"
+          }
+        }
+      }
+    },
+    "/api/seasons/{seasonId}": {
+      "get": {
+        "summary": "Get season by ID",
+        "description": "Returns a season by its ID, including winner info.",
+        "tags": [
+          "Seasons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seasonId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Season ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Season object"
+          },
+          "400": {
+            "description": "Invalid season id"
+          },
+          "404": {
+            "description": "Season not found"
+          },
+          "500": {
+            "description": "Failed to fetch season"
+          }
+        }
+      }
+    },
+    "/api/seasons/{seasonId}/standings": {
+      "get": {
+        "summary": "Get standings for a season",
+        "description": "Returns the standings table for a given season.",
+        "tags": [
+          "Seasons"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "seasonId",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Season ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Standings table for the season"
+          },
+          "400": {
+            "description": "Invalid season id"
+          },
+          "404": {
+            "description": "Season not found"
+          },
+          "500": {
+            "description": "Failed to fetch standings"
+          }
+        }
+      }
+    },
+    "/api/seasons": {
+      "get": {
+        "summary": "List seasons",
+        "description": "Returns a list of all seasons, ordered by start date descending.",
+        "tags": [
+          "Seasons"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of seasons"
+          }
+        }
+      }
+    },
+    "/api/standings": {
+      "get": {
+        "summary": "Get current standings",
+        "description": "Returns the current standings table for the most recent season (with a current matchday if available).",
+        "tags": [
+          "Standings"
+        ],
+        "responses": {
+          "200": {
+            "description": "Standings table for the current season"
+          }
+        }
+      }
+    },
+    "/api/tags/{id}": {
+      "get": {
+        "summary": "Get tag details",
+        "description": "Returns tag metadata and associated thread count.",
+        "tags": [
+          "Tags"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag details"
+          },
+          "400": {
+            "description": "Invalid tag id"
+          },
+          "404": {
+            "description": "Tag not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete a tag",
+        "description": "Deletes a tag by ID. Requires admin authentication.",
+        "tags": [
+          "Tags"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Tag deleted"
+          },
+          "400": {
+            "description": "Invalid tag id"
+          },
+          "404": {
+            "description": "Tag not found"
+          }
+        }
+      }
+    },
+    "/api/tags": {
+      "get": {
+        "summary": "List tags",
+        "description": "Returns tags ordered by thread count (desc) then name (asc). Supports optional prefix search.",
+        "tags": [
+          "Tags"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Prefix to match against the beginning of tag name or slug."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of tags"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a tag",
+        "description": "Creates a new tag. Requires authentication.",
+        "tags": [
+          "Tags"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "name"
+                ],
+                "properties": {
+                  "name": {
+                    "type": "string",
+                    "maxLength": 30
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Tag created"
+          },
+          "400": {
+            "description": "Invalid name"
+          },
+          "409": {
+            "description": "Tag already exists"
+          }
+        }
+      }
+    },
+    "/api/teams/{id}/matches": {
+      "get": {
+        "summary": "List matches for a team",
+        "description": "Returns a list of matches for a given team (as home or away).",
+        "tags": [
+          "Teams"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Team ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of matches for the team"
+          },
+          "400": {
+            "description": "Invalid team id"
+          },
+          "404": {
+            "description": "Team not found"
+          },
+          "500": {
+            "description": "Failed to fetch team matches"
+          }
+        }
+      }
+    },
+    "/api/teams/{id}": {
+      "get": {
+        "summary": "Get team by ID",
+        "description": "Returns a team by its ID.",
+        "tags": [
+          "Teams"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Team ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Team object"
+          },
+          "400": {
+            "description": "Invalid team id"
+          },
+          "404": {
+            "description": "Team not found"
+          },
+          "500": {
+            "description": "Failed to fetch team"
+          }
+        }
+      }
+    },
+    "/api/teams/{id}/threads": {
+      "get": {
+        "summary": "List threads for a team",
+        "description": "Returns a list of forum threads associated with a team.",
+        "tags": [
+          "Teams"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "Team ID"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of threads for the team"
+          },
+          "400": {
+            "description": "Invalid team id"
+          },
+          "404": {
+            "description": "Team not found"
+          },
+          "500": {
+            "description": "Failed to fetch team threads"
+          }
+        }
+      }
+    },
+    "/api/teams": {
+      "get": {
+        "summary": "List teams",
+        "description": "Returns a list of all teams.",
+        "tags": [
+          "Teams"
+        ],
+        "responses": {
+          "200": {
+            "description": "List of teams"
+          }
+        }
+      }
+    },
+    "/api/threads/{id}/polls": {
+      "get": {
+        "summary": "Get polls attached to thread",
+        "description": "Returns polls associated with a specific thread.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Poll list returned"
+          },
+          "400": {
+            "description": "Invalid thread id"
+          },
+          "500": {
+            "description": "Failed to fetch polls for thread"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create poll in thread",
+        "description": "Creates a poll attached to a specific thread.",
+        "tags": [
+          "Polls"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "question",
+                  "deadline",
+                  "options"
+                ],
+                "properties": {
+                  "question": {
+                    "type": "string"
+                  },
+                  "deadline": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "options": {
+                    "type": "array",
+                    "minItems": 2,
+                    "items": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Poll created"
+          },
+          "400": {
+            "description": "Invalid thread id or request body"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      }
+    },
+    "/api/threads/{id}/posts": {
+      "get": {
+        "summary": "List posts in a thread",
+        "description": "Returns visible posts for a thread in chronological order. Hidden threads are treated as not found.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Thread ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Posts returned"
+          },
+          "400": {
+            "description": "Invalid thread id",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidId": {
+                    "value": {
+                      "error": "Invalid thread id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Thread not found"
+          },
+          "500": {
+            "description": "Server error fetching posts"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a post in a thread",
+        "description": "Authenticated users can add a post (or reply) to an open thread. Hidden/closed threads are blocked.",
+        "tags": [
+          "Posts"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Thread ID",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "content"
+                ],
+                "properties": {
+                  "content": {
+                    "type": "string"
+                  },
+                  "parentPostId": {
+                    "type": "integer",
+                    "nullable": true
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Post created"
+          },
+          "400": {
+            "description": "Validation error (invalid ids or missing content)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingContent": {
+                    "value": {
+                      "error": "Content is required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden (banned user or blocked thread)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "banned": {
+                    "value": {
+                      "error": "You are banned"
+                    }
+                  },
+                  "hidden": {
+                    "value": {
+                      "error": "Thread is hidden"
+                    }
+                  },
+                  "closed": {
+                    "value": {
+                      "error": "Thread is closed"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Thread not found"
+          },
+          "500": {
+            "description": "Server error creating post"
+          }
+        }
+      }
+    },
+    "/api/threads/{id}/report": {
+      "post": {
+        "summary": "Report a thread (requires user auth)",
+        "description": "Submit a report for a thread by id with a short reason. Requires authenticated user.",
+        "tags": [
+          "Reports"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "description": "Numeric thread ID to report",
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "reason": {
+                    "type": "string",
+                    "description": "Concise reason for the report"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Report submitted successfully",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "success": {
+                    "value": {
+                      "reportId": 2,
+                      "targetType": "THREAD",
+                      "targetId": 1,
+                      "status": "OPEN",
+                      "createdAt": "2026-03-02T03:20:43.977Z"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request (invalid id or missing reason)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalid": {
+                    "value": {
+                      "error": "Invalid thread id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - authentication required"
+          },
+          "404": {
+            "description": "Thread not found"
+          },
+          "409": {
+            "description": "Conflict - already reported",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "conflict": {
+                    "value": {
+                      "error": "You have already reported this thread"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "500": {
+            "description": "Server error while submitting report"
+          }
+        }
+      }
+    },
+    "/api/threads/{id}": {
+      "get": {
+        "summary": "Get thread details",
+        "description": "Returns a thread with author, tags, and post count.",
+        "tags": [
+          "Threads"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread returned"
+          },
+          "400": {
+            "description": "Invalid thread id"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      },
+      "patch": {
+        "summary": "Edit thread",
+        "description": "Updates thread title and/or tags. Requires owner or admin.",
+        "tags": [
+          "Threads"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread updated"
+          },
+          "400": {
+            "description": "Invalid id or invalid payload"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Delete thread",
+        "description": "Deletes a thread. Requires owner or admin.",
+        "tags": [
+          "Threads"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Thread deleted"
+          },
+          "400": {
+            "description": "Invalid thread id"
+          },
+          "403": {
+            "description": "Forbidden"
+          },
+          "404": {
+            "description": "Thread not found"
+          }
+        }
+      }
+    },
+    "/api/threads/{id}/sentiment/recompute": {
+      "post": {
+        "summary": "Force recomputation of thread sentiment (requires admin auth)",
+        "description": "This endpont triggers a full recomputation of the thread's overall sentiment and per-team sentiment (when the thread is linked to a match). Access is restricted to authenticated administrators.\n",
+        "tags": [
+          "Threads",
+          "Sentiment"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric ID of the thread to recompute sentiment for",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "example": 1
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sentiment successfully recomputed and returned",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "recomputed": {
+                      "type": "boolean",
+                      "description": "Indicates the recomputation was performed"
+                    },
+                    "threadId": {
+                      "type": "integer"
+                    },
+                    "matchId": {
+                      "oneOf": [
+                        {
+                          "type": "integer"
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ],
+                      "description": "ID of the associated match or null if none"
+                    },
+                    "overall": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "sentiment": {
+                              "type": "string",
+                              "description": "Human-friendly sentiment label (e.g. positive|neutral|negative|mixed)"
+                            },
+                            "score": {
+                              "type": "number",
+                              "description": "Numeric sentiment score (range depends on implementation, often -1 to 1)"
+                            },
+                            "computedAt": {
+                              "type": "string",
+                              "format": "date-time"
+                            }
+                          },
+                          "required": [
+                            "sentiment",
+                            "score",
+                            "computedAt"
+                          ]
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "teams": {
+                      "type": "array",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "teamId": {
+                            "type": "integer"
+                          },
+                          "sentiment": {
+                            "type": "string",
+                            "description": "Team-level sentiment label"
+                          },
+                          "score": {
+                            "type": "number"
+                          },
+                          "computedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "home",
+                              "away"
+                            ]
+                          }
+                        },
+                        "required": [
+                          "teamId",
+                          "sentiment",
+                          "score",
+                          "computedAt",
+                          "kind"
+                        ]
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "recomputed": true,
+                      "threadId": 1,
+                      "matchId": 1,
+                      "overall": {
+                        "sentiment": "negative",
+                        "score": -0.85,
+                        "computedAt": "2026-03-01T23:52:11.632Z"
+                      },
+                      "teams": [
+                        {
+                          "teamId": 1,
+                          "sentiment": "mixed",
+                          "score": 0,
+                          "computedAt": "2026-03-01T23:52:11.632Z",
+                          "kind": "home"
+                        },
+                        {
+                          "teamId": 2,
+                          "sentiment": "negative",
+                          "score": -0.5,
+                          "computedAt": "2026-03-01T23:52:11.632Z",
+                          "kind": "away"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad request — invalid thread id or malformed parameter",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Invalid thread id"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized — missing or invalid authentication token",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Unauthorized"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden — authenticated user lacks admin privileges",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Forbidden"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not found — specified thread does not exist",
+            "content": {
+              "application/json": {
+                "example": {
+                  "error": "Thread not found"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/threads/{id}/sentiment": {
+      "get": {
+        "summary": "Compute or retrieve cached sentiment summary for a forum thread (requires user auth)",
+        "description": "Computes sentiment for a thread and updates/creates sentiment summary records in the database. If a recent sentiment summary exists (within the TTL window), the cached result is returned instead of recomputing. Requires authenticated user.\n",
+        "tags": [
+          "Threads",
+          "Sentiment"
+        ],
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "description": "Numeric ID of the forum thread",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Sentiment summary returned (computed or cached)",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "threadId",
+                    "cache"
+                  ],
+                  "properties": {
+                    "threadId": {
+                      "type": "integer",
+                      "description": "Forum thread id"
+                    },
+                    "matchId": {
+                      "type": "integer",
+                      "nullable": true,
+                      "description": "Associated match id, if any"
+                    },
+                    "cache": {
+                      "type": "object",
+                      "properties": {
+                        "cached": {
+                          "type": "boolean",
+                          "description": "True if the response was returned from cache"
+                        },
+                        "ttlMs": {
+                          "type": "integer",
+                          "description": "Time-to-live for cached sentiment in milliseconds"
+                        }
+                      }
+                    },
+                    "overall": {
+                      "oneOf": [
+                        {
+                          "type": "object",
+                          "properties": {
+                            "sentiment": {
+                              "type": "string",
+                              "description": "Label for overall sentiment (e.g., positive, neutral, negative)"
+                            },
+                            "score": {
+                              "type": "number",
+                              "format": "float",
+                              "description": "Numeric sentiment score"
+                            },
+                            "computedAt": {
+                              "type": "string",
+                              "format": "date-time",
+                              "description": "UTC timestamp when this summary was computed"
+                            }
+                          }
+                        },
+                        {
+                          "type": "null"
+                        }
+                      ]
+                    },
+                    "teams": {
+                      "type": "array",
+                      "description": "Per-team sentiment summaries (home/away)",
+                      "items": {
+                        "type": "object",
+                        "properties": {
+                          "teamId": {
+                            "type": "integer"
+                          },
+                          "sentiment": {
+                            "type": "string"
+                          },
+                          "score": {
+                            "type": "number"
+                          },
+                          "computedAt": {
+                            "type": "string",
+                            "format": "date-time"
+                          },
+                          "kind": {
+                            "type": "string",
+                            "enum": [
+                              "home",
+                              "away"
+                            ]
+                          }
+                        }
+                      }
+                    }
+                  }
+                },
+                "examples": {
+                  "sampleResponse": {
+                    "value": {
+                      "threadId": 1,
+                      "matchId": 1,
+                      "cache": {
+                        "cached": false,
+                        "ttlMs": 900000
+                      },
+                      "overall": {
+                        "sentiment": "mixed",
+                        "score": 0,
+                        "computedAt": "2026-03-01T23:48:51.419Z"
+                      },
+                      "teams": [
+                        {
+                          "teamId": 1,
+                          "sentiment": "mixed",
+                          "score": 0,
+                          "computedAt": "2026-03-01T23:48:51.419Z",
+                          "kind": "home"
+                        },
+                        {
+                          "teamId": 2,
+                          "sentiment": "negative",
+                          "score": -0.5,
+                          "computedAt": "2026-03-01T23:48:51.419Z",
+                          "kind": "away"
+                        }
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid request (e.g., non-numeric id) or server-side failure",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "invalidId": {
+                    "value": {
+                      "error": "Invalid thread id"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized - authentication required",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "unauthorized": {
+                    "value": {
+                      "error": "Unauthorized"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden - insufficient permissions",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "forbidden": {
+                    "value": {
+                      "error": "Forbidden"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Thread not found",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "notFound": {
+                    "value": {
+                      "error": "Thread not found"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/threads": {
+      "get": {
+        "summary": "List threads",
+        "description": "Returns threads and supports optional filtering by title, author username, team id, and comma-separated tags.",
+        "tags": [
+          "Threads"
+        ],
+        "parameters": [
+          {
+            "in": "query",
+            "name": "title",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "author",
+            "required": false,
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "team",
+            "required": false,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "tags",
+            "required": false,
+            "schema": {
+              "type": "string"
+            },
+            "description": "Comma-separated tag names or slugs."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Threads returned"
+          },
+          "400": {
+            "description": "Invalid team id"
+          },
+          "500": {
+            "description": "Failed to search threads"
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a new thread (with initial post)",
+        "description": "Authenticated users can create a thread with its first post. Optional associations to a team or match can be supplied.",
+        "tags": [
+          "Threads"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "title",
+                  "content"
+                ],
+                "properties": {
+                  "title": {
+                    "type": "string"
+                  },
+                  "content": {
+                    "type": "string"
+                  },
+                  "teamId": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "matchId": {
+                    "type": "integer",
+                    "nullable": true
+                  },
+                  "slug": {
+                    "type": "string",
+                    "nullable": true
+                  },
+                  "tags": {
+                    "type": "array",
+                    "items": {
+                      "type": "string",
+                      "maxLength": 50
+                    }
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Thread created"
+          },
+          "400": {
+            "description": "Validation error (missing title/content or bad ids)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "missingTitle": {
+                    "value": {
+                      "error": "Title and content are required"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "User forbidden (banned)",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "banned": {
+                    "value": {
+                      "error": "You are banned"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Related team or match not found"
+          },
+          "409": {
+            "description": "Could not generate a unique slug"
+          },
+          "500": {
+            "description": "Server error while creating the thread"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/activity": {
+      "get": {
+        "summary": "Get user activity over a time period",
+        "description": "Returns daily activity (posts and comments/replies count) for charting. Activity = posts + comments authored by the user. No auth required.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "days",
+            "schema": {
+              "type": "integer",
+              "default": 30
+            },
+            "description": "Number of days (from today backwards). Ignored if from/to provided."
+          },
+          {
+            "in": "query",
+            "name": "from",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "Start date (ISO 8601). Use with to."
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "schema": {
+              "type": "string",
+              "format": "date"
+            },
+            "description": "End date (ISO 8601). Use with from."
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Activity timeline with daily buckets (postsCount, commentsCount, totalActivity)"
+          },
+          "400": {
+            "description": "Invalid user id or invalid period params"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/follow": {
+      "post": {
+        "summary": "Follow a user",
+        "description": "Authenticated user follows the user with the given id. Cannot follow self. Idempotent if already following.",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User id to follow (followee)"
+          }
+        ],
+        "responses": {
+          "201": {
+            "description": "Now following the user"
+          },
+          "400": {
+            "description": "Invalid user id or cannot follow self"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User to follow not found"
+          }
+        }
+      },
+      "delete": {
+        "summary": "Unfollow a user",
+        "description": "Authenticated user unfollows the user with the given id.",
+        "tags": [
+          "Users"
+        ],
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            },
+            "description": "User id to unfollow (followee)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Unfollowed (or was not following)"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "401": {
+            "description": "Unauthorized"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/followers": {
+      "get": {
+        "summary": "List user followers",
+        "description": "Returns users who follow this user. Sorted by follow time (newest first). No auth required.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of followers with follow time"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/following": {
+      "get": {
+        "summary": "List users this user follows",
+        "description": "Returns users that this user follows. Sorted by follow time (newest first). No auth required.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of followed users with follow time"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/posts": {
+      "get": {
+        "summary": "Get posts and replies by user",
+        "description": "Returns posts and replies authored by this user. Includes thread info. Optional limit/offset. No auth required. Hidden posts are excluded.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 50
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of posts (and replies)"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/users/{id}": {
+      "get": {
+        "summary": "Get public user profile",
+        "description": "Returns public profile for a user - username, displayName, avatar, favorite team, counts of followers/following, and counts of threads/posts. No auth required.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "User profile with counts and associated team"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    },
+    "/api/users/{id}/threads": {
+      "get": {
+        "summary": "Get threads created by user",
+        "description": "Returns threads authored by this user. Optional limit/offset for pagination. No auth required.",
+        "tags": [
+          "Users"
+        ],
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "type": "integer",
+              "default": 30
+            }
+          },
+          {
+            "in": "query",
+            "name": "offset",
+            "schema": {
+              "type": "integer",
+              "default": 0
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of threads"
+          },
+          "400": {
+            "description": "Invalid user id"
+          },
+          "404": {
+            "description": "User not found"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "Media": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "url": {
+            "type": "string"
+          },
+          "altText": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "uploadedById": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "uploadedBy": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "userAvatar": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "url",
+          "createdAt"
+        ]
+      },
+      "Follow": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "followerId": {
+            "type": "integer"
+          },
+          "followeeId": {
+            "type": "integer"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "follower": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "followee": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "followerId",
+          "followeeId",
+          "createdAt",
+          "follower",
+          "followee"
+        ]
+      },
+      "User": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "email": {
+            "type": "string"
+          },
+          "username": {
+            "type": "string"
+          },
+          "displayName": {
+            "type": "string"
+          },
+          "password": {
+            "type": "string"
+          },
+          "role": {
+            "type": "string",
+            "$ref": "#/components/schemas/Role"
+          },
+          "favoriteTeamId": {
+            "type": "integer"
+          },
+          "avatarMediaId": {
+            "type": "integer"
+          },
+          "isBanned": {
+            "type": "boolean"
+          },
+          "banUntil": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "banReason": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "avatarMedia": {
+            "type": "object",
+            "$ref": "#/components/schemas/Media"
+          },
+          "mediaUploaded": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Media"
+            }
+          },
+          "favoriteTeam": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          },
+          "followers": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Follow"
+            }
+          },
+          "following": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Follow"
+            }
+          },
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          },
+          "postEdits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostEdit"
+            }
+          },
+          "threads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ForumThread"
+            }
+          },
+          "createdPolls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Poll"
+            }
+          },
+          "pollVotes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollVote"
+            }
+          },
+          "generatedDigests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/DailyDigest"
+            }
+          },
+          "reportsAuthored": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Report"
+            }
+          },
+          "reportsReviewed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Report"
+            }
+          },
+          "bans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ban"
+            }
+          },
+          "bansPlaced": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Ban"
+            }
+          },
+          "banAppeals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BanAppeal"
+            }
+          },
+          "decidedAppeals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BanAppeal"
+            }
+          },
+          "moderationActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationAction"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "username",
+          "password",
+          "role",
+          "isBanned",
+          "createdAt",
+          "mediaUploaded",
+          "followers",
+          "following",
+          "posts",
+          "postEdits",
+          "threads",
+          "createdPolls",
+          "pollVotes",
+          "generatedDigests",
+          "reportsAuthored",
+          "reportsReviewed",
+          "bans",
+          "bansPlaced",
+          "banAppeals",
+          "decidedAppeals",
+          "moderationActions"
+        ]
+      },
+      "TranslationCache": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "originalTextHash": {
+            "type": "string"
+          },
+          "sourceLanguage": {
+            "type": "string"
+          },
+          "targetLanguage": {
+            "type": "string"
+          },
+          "translatedText": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        },
+        "required": [
+          "id",
+          "originalTextHash",
+          "targetLanguage",
+          "translatedText",
+          "createdAt"
+        ]
+      },
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "threadId": {
+            "type": "integer"
+          },
+          "authorId": {
+            "type": "integer"
+          },
+          "parentPostId": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "isHidden": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "thread": {
+            "type": "object",
+            "$ref": "#/components/schemas/ForumThread"
+          },
+          "author": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "parentPost": {
+            "type": "object",
+            "$ref": "#/components/schemas/Post"
+          },
+          "replies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          },
+          "edits": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PostEdit"
+            }
+          },
+          "moderationVerdicts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiModerationVerdict"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "authorId",
+          "content",
+          "isHidden",
+          "createdAt",
+          "updatedAt",
+          "author",
+          "replies",
+          "edits",
+          "moderationVerdicts"
+        ]
+      },
+      "Report": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "reporterId": {
+            "type": "integer"
+          },
+          "targetType": {
+            "type": "string",
+            "$ref": "#/components/schemas/ReportTargetType"
+          },
+          "targetId": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "$ref": "#/components/schemas/ReportStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reviewerId": {
+            "type": "integer"
+          },
+          "reporter": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "reviewer": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "aiVerdicts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AiModerationVerdict"
+            }
+          },
+          "moderationActions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationAction"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "targetType",
+          "targetId",
+          "reason",
+          "status",
+          "createdAt",
+          "aiVerdicts",
+          "moderationActions"
+        ]
+      },
+      "PostEdit": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "editorId": {
+            "type": "integer"
+          },
+          "previousContent": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "editedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "postId": {
+            "type": "integer"
+          },
+          "post": {
+            "type": "object",
+            "$ref": "#/components/schemas/Post"
+          },
+          "editor": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "previousContent",
+          "editedAt",
+          "postId",
+          "post"
+        ]
+      },
+      "Team": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "shortName": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "tla": {
+            "type": "string"
+          },
+          "crest": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "website": {
+            "type": "string"
+          },
+          "founded": {
+            "type": "integer"
+          },
+          "clubColors": {
+            "type": "string"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "area": {
+            "type": "object"
+          },
+          "runningCompetitions": {
+            "type": "object"
+          },
+          "coach": {
+            "type": "object"
+          },
+          "marketValue": {
+            "type": "integer"
+          },
+          "squad": {
+            "type": "object"
+          },
+          "staff": {
+            "type": "object"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "homeMatches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            }
+          },
+          "awayMatches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            }
+          },
+          "threads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ForumThread"
+            }
+          },
+          "fans": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/User"
+            }
+          },
+          "sentiments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SentimentSummary"
+            }
+          },
+          "standings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamStanding"
+            }
+          },
+          "seasonsWon": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Season"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "createdAt",
+          "updatedAt",
+          "homeMatches",
+          "awayMatches",
+          "threads",
+          "fans",
+          "sentiments",
+          "standings",
+          "seasonsWon"
+        ]
+      },
+      "Match": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "externalId": {
+            "type": "string"
+          },
+          "homeTeamId": {
+            "type": "integer"
+          },
+          "awayTeamId": {
+            "type": "integer"
+          },
+          "homeScore": {
+            "type": "integer"
+          },
+          "awayScore": {
+            "type": "integer"
+          },
+          "status": {
+            "type": "string"
+          },
+          "startTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endTime": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "utcDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "minute": {
+            "type": "integer"
+          },
+          "injuryTime": {
+            "type": "integer"
+          },
+          "attendance": {
+            "type": "integer"
+          },
+          "venue": {
+            "type": "string"
+          },
+          "matchday": {
+            "type": "integer"
+          },
+          "stage": {
+            "type": "string"
+          },
+          "group": {
+            "type": "string"
+          },
+          "lastUpdated": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "seasonId": {
+            "type": "integer"
+          },
+          "homeDetails": {
+            "type": "object"
+          },
+          "awayDetails": {
+            "type": "object"
+          },
+          "score": {
+            "type": "object"
+          },
+          "goals": {
+            "type": "object"
+          },
+          "penalties": {
+            "type": "object"
+          },
+          "bookings": {
+            "type": "object"
+          },
+          "substitutions": {
+            "type": "object"
+          },
+          "odds": {
+            "type": "object"
+          },
+          "referees": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "homeTeam": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          },
+          "awayTeam": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          },
+          "season": {
+            "type": "object",
+            "$ref": "#/components/schemas/Season"
+          },
+          "threads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ForumThread"
+            }
+          },
+          "sentiments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SentimentSummary"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "homeTeamId",
+          "awayTeamId",
+          "status",
+          "startTime",
+          "createdAt",
+          "updatedAt",
+          "homeTeam",
+          "awayTeam",
+          "threads",
+          "sentiments"
+        ]
+      },
+      "Season": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "externalId": {
+            "type": "integer"
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "currentMatchday": {
+            "type": "integer"
+          },
+          "winnerId": {
+            "type": "integer"
+          },
+          "winner": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          },
+          "standings": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/TeamStanding"
+            }
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "startDate",
+          "endDate",
+          "standings",
+          "matches"
+        ]
+      },
+      "AiModerationVerdict": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "postId": {
+            "type": "integer"
+          },
+          "reportId": {
+            "type": "integer"
+          },
+          "verdict": {
+            "type": "string"
+          },
+          "toxicityScore": {
+            "type": "number"
+          },
+          "explanation": {
+            "type": "string"
+          },
+          "contentSnapshot": {
+            "type": "string"
+          },
+          "rawResponse": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "post": {
+            "type": "object",
+            "$ref": "#/components/schemas/Post"
+          },
+          "report": {
+            "type": "object",
+            "$ref": "#/components/schemas/Report"
+          }
+        },
+        "required": [
+          "id",
+          "postId",
+          "verdict",
+          "createdAt",
+          "post"
+        ]
+      },
+      "TeamStanding": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "seasonId": {
+            "type": "integer"
+          },
+          "teamId": {
+            "type": "integer"
+          },
+          "position": {
+            "type": "integer"
+          },
+          "played": {
+            "type": "integer"
+          },
+          "wins": {
+            "type": "integer"
+          },
+          "draws": {
+            "type": "integer"
+          },
+          "losses": {
+            "type": "integer"
+          },
+          "goalsFor": {
+            "type": "integer"
+          },
+          "goalsAgainst": {
+            "type": "integer"
+          },
+          "goalDifference": {
+            "type": "integer"
+          },
+          "points": {
+            "type": "integer"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "season": {
+            "type": "object",
+            "$ref": "#/components/schemas/Season"
+          },
+          "team": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          }
+        },
+        "required": [
+          "id",
+          "seasonId",
+          "teamId",
+          "position",
+          "updatedAt",
+          "team"
+        ]
+      },
+      "DailyDigest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "generatedById": {
+            "type": "integer"
+          },
+          "content": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "generatedBy": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "date",
+          "content",
+          "createdAt",
+          "updatedAt"
+        ]
+      },
+      "ForumThread": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "title": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "isClosed": {
+            "type": "boolean"
+          },
+          "isHidden": {
+            "type": "boolean"
+          },
+          "autoOpenAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "autoCloseAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "matchId": {
+            "type": "integer"
+          },
+          "teamId": {
+            "type": "integer"
+          },
+          "match": {
+            "type": "object",
+            "$ref": "#/components/schemas/Match"
+          },
+          "team": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          },
+          "authorId": {
+            "type": "integer"
+          },
+          "author": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "posts": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Post"
+            }
+          },
+          "sentiments": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SentimentSummary"
+            }
+          },
+          "tags": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Tag"
+            }
+          },
+          "polls": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Poll"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "isClosed",
+          "isHidden",
+          "createdAt",
+          "updatedAt",
+          "posts",
+          "sentiments",
+          "tags",
+          "polls"
+        ]
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "threads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ForumThread"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "name",
+          "slug",
+          "createdAt",
+          "threads"
+        ]
+      },
+      "Poll": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "threadId": {
+            "type": "integer"
+          },
+          "question": {
+            "type": "string"
+          },
+          "createdById": {
+            "type": "integer"
+          },
+          "deadline": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "isClosed": {
+            "type": "boolean"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "thread": {
+            "type": "object",
+            "$ref": "#/components/schemas/ForumThread"
+          },
+          "createdBy": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollOption"
+            }
+          },
+          "votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollVote"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "question",
+          "createdById",
+          "deadline",
+          "isClosed",
+          "createdAt",
+          "createdBy",
+          "options",
+          "votes"
+        ]
+      },
+      "PollOption": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "pollId": {
+            "type": "integer"
+          },
+          "label": {
+            "type": "string"
+          },
+          "metadata": {
+            "type": "object"
+          },
+          "poll": {
+            "type": "object",
+            "$ref": "#/components/schemas/Poll"
+          },
+          "votes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PollVote"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "pollId",
+          "label",
+          "poll",
+          "votes"
+        ]
+      },
+      "PollVote": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "pollId": {
+            "type": "integer"
+          },
+          "optionId": {
+            "type": "integer"
+          },
+          "voterId": {
+            "type": "integer"
+          },
+          "votedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "poll": {
+            "type": "object",
+            "$ref": "#/components/schemas/Poll"
+          },
+          "option": {
+            "type": "object",
+            "$ref": "#/components/schemas/PollOption"
+          },
+          "voter": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "pollId",
+          "optionId",
+          "voterId",
+          "votedAt",
+          "poll",
+          "option",
+          "voter"
+        ]
+      },
+      "ModerationAction": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "reportId": {
+            "type": "integer"
+          },
+          "actionType": {
+            "type": "string",
+            "$ref": "#/components/schemas/ModerationActionType"
+          },
+          "performedById": {
+            "type": "integer"
+          },
+          "details": {
+            "type": "object"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "report": {
+            "type": "object",
+            "$ref": "#/components/schemas/Report"
+          },
+          "performedBy": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "actionType",
+          "performedById",
+          "createdAt",
+          "performedBy"
+        ]
+      },
+      "Ban": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "bannedById": {
+            "type": "integer"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "until": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "liftedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "user": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "bannedBy": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "appeals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/BanAppeal"
+            }
+          }
+        },
+        "required": [
+          "id",
+          "userId",
+          "bannedById",
+          "reason",
+          "createdAt",
+          "user",
+          "bannedBy",
+          "appeals"
+        ]
+      },
+      "BanAppeal": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "banId": {
+            "type": "integer"
+          },
+          "userId": {
+            "type": "integer"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "$ref": "#/components/schemas/BanAppealStatus"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "decidedById": {
+            "type": "integer"
+          },
+          "ban": {
+            "type": "object",
+            "$ref": "#/components/schemas/Ban"
+          },
+          "user": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          },
+          "decidedBy": {
+            "type": "object",
+            "$ref": "#/components/schemas/User"
+          }
+        },
+        "required": [
+          "id",
+          "banId",
+          "userId",
+          "message",
+          "status",
+          "createdAt",
+          "ban",
+          "user"
+        ]
+      },
+      "SentimentSummary": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "integer"
+          },
+          "threadId": {
+            "type": "integer"
+          },
+          "matchId": {
+            "type": "integer"
+          },
+          "teamId": {
+            "type": "integer"
+          },
+          "scope": {
+            "type": "string"
+          },
+          "targetKey": {
+            "type": "string"
+          },
+          "sentiment": {
+            "type": "string"
+          },
+          "score": {
+            "type": "number"
+          },
+          "computedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "thread": {
+            "type": "object",
+            "$ref": "#/components/schemas/ForumThread"
+          },
+          "match": {
+            "type": "object",
+            "$ref": "#/components/schemas/Match"
+          },
+          "team": {
+            "type": "object",
+            "$ref": "#/components/schemas/Team"
+          }
+        },
+        "required": [
+          "id",
+          "threadId",
+          "scope",
+          "targetKey",
+          "sentiment",
+          "score",
+          "computedAt",
+          "thread"
+        ]
+      },
+      "Role": {
+        "type": "string",
+        "enum": [
+          "USER",
+          "ADMIN"
+        ]
+      },
+      "ReportTargetType": {
+        "type": "string",
+        "enum": [
+          "POST",
+          "THREAD"
+        ]
+      },
+      "ReportStatus": {
+        "type": "string",
+        "enum": [
+          "OPEN",
+          "REVIEWED",
+          "DISMISSED",
+          "ACTIONED"
+        ]
+      },
+      "BanAppealStatus": {
+        "type": "string",
+        "enum": [
+          "PENDING",
+          "APPROVED",
+          "DENIED"
+        ]
+      },
+      "ModerationActionType": {
+        "type": "string",
+        "enum": [
+          "DISMISS",
+          "HIDE",
+          "BAN",
+          "UNBAN"
+        ]
+      }
+    }
+  },
+  "tags": []
+}

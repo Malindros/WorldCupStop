@@ -1,0 +1,493 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated"
+}
+
+datasource db {
+  provider = "postgresql"
+  url = env("DATABASE_URL")
+}
+
+generator openapi {
+  provider      = "prisma-openapi"
+  output        = "./openapi"
+  generateJsDoc = true
+}
+
+
+enum Role {
+  USER
+  ADMIN
+}
+
+enum AuthProvider {
+  GOOGLE
+  GITHUB
+}
+
+enum ReportTargetType {
+  POST
+  THREAD
+}
+
+enum ReportReasonCode {
+  SPAM
+  HARASSMENT
+  HATE_SPEECH
+  VIOLENCE
+  SEXUAL_CONTENT
+  MISINFORMATION
+  OTHER
+  SYSTEM_FLAGGED
+}
+
+enum ReportStatus {
+  OPEN
+  REVIEWED
+  DISMISSED
+  ACTIONED
+}
+
+enum BanAppealStatus {
+  PENDING
+  APPROVED
+  DENIED
+}
+
+enum ModerationActionType {
+  DISMISS
+  HIDE
+  BAN
+  UNBAN
+}
+
+
+model Media {
+  id Int @id @default(autoincrement())
+  url String
+  altText String?
+  metadata Json?
+  uploadedById Int?
+  createdAt DateTime @default(now())
+
+  uploadedBy User? @relation("MediaUploadedBy", fields: [uploadedById], references: [id])
+  userAvatar User? @relation("UserAvatar")
+}
+
+model Follow {
+  id Int @id @default(autoincrement())
+  followerId Int
+  followeeId Int
+  createdAt DateTime @default(now())
+
+  follower User @relation("Following", fields: [followerId], references: [id], onDelete: Cascade)
+  followee User @relation("Followers", fields: [followeeId], references: [id], onDelete: Cascade)
+
+  @@unique([followerId, followeeId])
+  @@index([followeeId])
+  @@index([followerId])
+}
+
+model User {
+  id Int @id @default(autoincrement())
+  email String? @unique  // required for email/password signup; null for OAuth-only
+  username String @unique
+  displayName String?
+  password String        // hashed; required for email signup
+  authProvider AuthProvider?
+  authProviderUserId String?
+  role Role @default(USER)
+  favoriteTeamId Int?
+  avatarMediaId Int? @unique
+  isBanned Boolean @default(false)
+  banUntil DateTime?
+  banReason String?
+  createdAt DateTime @default(now())
+
+  avatarMedia Media? @relation("UserAvatar", fields: [avatarMediaId], references: [id])
+  mediaUploaded Media[] @relation("MediaUploadedBy")
+  favoriteTeam Team? @relation(fields: [favoriteTeamId], references: [id])
+  followers Follow[] @relation("Followers")
+  following Follow[] @relation("Following")
+  posts Post[]
+  postEdits PostEdit[]
+  threads ForumThread[]
+  createdPolls Poll[] @relation("PollCreatedBy")
+  pollVotes PollVote[]
+  generatedDigests DailyDigest[] @relation("DailyDigestGeneratedBy")
+  reportsAuthored Report[] @relation("ReportsAuthored")
+  reportsReviewed Report[] @relation("ReportsReviewed")
+  bans Ban[] @relation("UserBans")
+  bansPlaced Ban[] @relation("AdminBans")
+  banAppeals BanAppeal[] @relation("UserBanAppeals")
+  decidedAppeals BanAppeal[] @relation("DecidedBanAppeals")
+  moderationActions ModerationAction[] @relation("UserModerationActions")
+
+  @@unique([authProvider, authProviderUserId])
+}
+
+model TranslationCache {
+  id Int @id @default(autoincrement())
+  originalTextHash String @unique
+  sourceLanguage String?
+  targetLanguage String
+  translatedText String
+  createdAt DateTime @default(now())
+}
+
+model Post {
+  id Int @id @default(autoincrement())
+  threadId Int?
+  authorId Int
+  parentPostId Int?
+  content String
+  language String? // on post creation, we should attempt to detect the language and store it here. user story says "translate from different language into english" so its hard to detect "different language" on the fly prolly.
+  isHidden Boolean @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  thread ForumThread? @relation(fields: [threadId], references: [id])
+  author User @relation(fields: [authorId], references: [id])
+  parentPost Post? @relation("PostReplies", fields: [parentPostId], references: [id])
+  replies Post[] @relation("PostReplies")
+  edits PostEdit[]
+  moderationVerdicts AiModerationVerdict[]
+}
+
+model Report {
+  id Int @id @default(autoincrement())
+  reporterId Int? // null -> system-generated report (AI auto-flag)
+  targetType ReportTargetType
+  targetId Int
+  reasonCode ReportReasonCode @default(OTHER)
+  additionalComment String?
+  reason String
+  status ReportStatus @default(OPEN)
+  createdAt DateTime @default(now())
+  reviewedAt DateTime?
+  reviewerId Int?
+
+  reporter User? @relation("ReportsAuthored", fields: [reporterId], references: [id])
+  reviewer User? @relation("ReportsReviewed", fields: [reviewerId], references: [id])
+  aiVerdicts AiModerationVerdict[]
+  moderationActions ModerationAction[]
+
+  @@unique([reporterId, targetType, targetId])
+}
+
+model PostEdit {
+  id Int @id @default(autoincrement())
+  editorId Int?
+  previousContent String
+  language String?
+  editedAt DateTime @default(now())
+  
+  postId Int
+  post Post @relation(fields: [postId], references: [id])
+  editor User? @relation(fields: [editorId], references: [id])
+}
+
+model Team {
+  id Int @id @default(autoincrement())
+  externalId String? @unique
+  name String @unique
+  shortName String?
+  slug String? // teams don't have slugs in the API
+  tla String?
+  crest String?
+  address String?
+  website String?
+  founded Int?
+  clubColors String?
+  venue String?
+  area Json?
+  runningCompetitions Json?
+  coach Json?
+  marketValue Int?
+  squad Json?
+  staff Json?
+  lastUpdated DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  homeMatches Match[] @relation("HomeMatches")
+  awayMatches Match[] @relation("AwayMatches")
+  threads ForumThread[]
+  fans User[]
+  sentiments SentimentSummary[]
+  standings TeamStanding[]
+  seasonsWon Season[]
+}
+
+model Match {
+  id Int @id @default(autoincrement())
+  externalId String? @unique
+  homeTeamId Int
+  awayTeamId Int
+  homeScore Int?
+  awayScore Int?
+  status String @default("scheduled")
+  startTime DateTime
+  endTime DateTime?
+  utcDate DateTime?     // original utcDate from external API
+  minute Int?
+  injuryTime Int?
+  attendance Int?
+  venue String?
+  matchday Int?
+  stage String?
+  group String?
+  lastUpdated DateTime?
+  seasonId Int?
+  homeDetails Json?
+  awayDetails Json?
+  score Json?
+  goals Json?
+  penalties Json?
+  bookings Json?
+  substitutions Json?
+  odds Json?
+  referees Json?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  homeTeam Team @relation("HomeMatches", fields: [homeTeamId], references: [id])
+  awayTeam Team @relation("AwayMatches", fields: [awayTeamId], references: [id])
+  season   Season? @relation(fields: [seasonId], references: [id])
+  threads ForumThread[]
+  sentiments SentimentSummary[]
+}
+
+
+model Season {
+  id               Int      @id @default(autoincrement())
+  externalId       Int?     @unique
+  startDate        DateTime
+  endDate          DateTime
+  currentMatchday  Int?
+  winnerId         Int?     @map("winner")
+
+  winner           Team?    @relation(fields: [winnerId], references: [id])
+  standings        TeamStanding[]
+  matches          Match[]
+}
+
+model AiModerationVerdict {
+  id Int @id @default(autoincrement())
+  postId Int
+  reportId Int?
+  verdict String
+  toxicityScore Float?
+  explanation String?
+  contentSnapshot String?
+  rawResponse Json?
+  createdAt DateTime @default(now())
+
+  post Post @relation(fields: [postId], references: [id])
+  report Report? @relation(fields: [reportId], references: [id])
+
+  @@index([postId, createdAt])
+  @@index([reportId])
+}
+
+model TeamStanding {
+  id             Int      @id @default(autoincrement())
+  seasonId       Int
+  teamId         Int
+  position       Int
+  played         Int?     
+  wins           Int?
+  draws          Int?
+  losses         Int?
+  goalsFor       Int?
+  goalsAgainst   Int?
+  goalDifference Int?
+  points         Int?
+  updatedAt      DateTime @updatedAt
+
+  season Season? @relation(fields: [seasonId], references: [id])
+  team   Team    @relation(fields: [teamId], references: [id])
+
+  @@index([updatedAt])
+  @@index([teamId, updatedAt])
+}
+
+model DailyDigest {
+  id Int @id @default(autoincrement())
+  date DateTime
+  generatedById Int?
+  content Json
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  generatedBy User? @relation("DailyDigestGeneratedBy", fields: [generatedById], references: [id])
+
+  @@unique([date])
+}
+
+model ForumThread {
+  id Int @id @default(autoincrement())
+  title String
+  slug String? @unique
+  isClosed Boolean @default(false)
+  isHidden Boolean @default(false)
+  autoOpenAt DateTime?
+  autoCloseAt DateTime?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // threads are either match-specific, team-specific, or general. 
+  // matchId set => match thread
+  // teamId set => team thread
+  // neither set => general thread
+  matchId Int?
+  teamId Int?
+  match Match? @relation(fields: [matchId], references: [id])
+  team Team? @relation(fields: [teamId], references: [id])
+  
+  // auto-generated threads have no author so its optional
+  authorId Int?
+  author User? @relation(fields: [authorId], references: [id])
+
+  posts Post[]
+  sentiments SentimentSummary[]
+  tags Tag[]
+  polls Poll[]
+
+  @@index([teamId])
+  @@index([matchId])
+  @@index([authorId])
+  @@index([createdAt])
+}
+
+model Tag {
+  id Int @id @default(autoincrement())
+  name String @unique
+  slug String @unique
+  createdAt DateTime @default(now())
+
+  threads ForumThread[]
+}
+
+model Poll {
+  id Int @id @default(autoincrement())
+  threadId Int?
+  question String
+  createdById Int
+  deadline DateTime
+  isClosed Boolean @default(false)
+  createdAt DateTime @default(now())
+
+  thread ForumThread? @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  createdBy User @relation("PollCreatedBy", fields: [createdById], references: [id])
+  options PollOption[]
+  votes PollVote[]
+
+  @@index([threadId])
+  @@index([createdById])
+  @@index([isClosed])
+}
+
+model PollOption {
+  id Int @id @default(autoincrement())
+  pollId Int
+  label String
+  metadata Json?
+
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  votes PollVote[]
+
+  @@index([pollId])
+}
+
+model PollVote {
+  id Int @id @default(autoincrement())
+  pollId Int
+  optionId Int
+  voterId Int
+  votedAt DateTime @default(now())
+
+  poll Poll @relation(fields: [pollId], references: [id], onDelete: Cascade)
+  option PollOption @relation(fields: [optionId], references: [id], onDelete: Cascade)
+  voter User @relation(fields: [voterId], references: [id], onDelete: Cascade)
+
+  @@unique([pollId, voterId])
+  @@index([optionId])
+  @@index([voterId])
+}
+
+model ModerationAction {
+  id Int @id @default(autoincrement())
+  reportId Int?
+  actionType ModerationActionType
+  performedById Int
+  details Json?
+  createdAt DateTime @default(now())
+
+  report Report? @relation(fields: [reportId], references: [id])
+  performedBy User @relation("UserModerationActions", fields: [performedById], references: [id])
+
+  @@index([reportId])
+  @@index([performedById])
+}
+
+model Ban {
+  id Int @id @default(autoincrement())
+  userId Int
+  bannedById Int
+  reason String
+  until DateTime?
+  liftedAt DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation("UserBans", fields: [userId], references: [id])
+  bannedBy User @relation("AdminBans", fields: [bannedById], references: [id])
+  appeals BanAppeal[]
+
+  @@index([userId])
+  @@index([bannedById])
+  @@index([liftedAt])
+}
+
+model BanAppeal {
+  id Int @id @default(autoincrement())
+  banId Int
+  userId Int
+  message String
+  status BanAppealStatus @default(PENDING)
+  createdAt DateTime @default(now())
+  decidedAt DateTime?
+  decidedById Int?
+
+  ban Ban @relation(fields: [banId], references: [id])
+  user User @relation("UserBanAppeals", fields: [userId], references: [id])
+  decidedBy User? @relation("DecidedBanAppeals", fields: [decidedById], references: [id])
+
+  @@index([banId])
+  @@index([userId])
+  @@index([status])
+}
+
+model SentimentSummary {
+  id Int @id @default(autoincrement())
+  threadId Int
+  matchId Int?
+  teamId Int?
+  scope String // overall or team
+  targetKey String // helps enforce uniqueness even when teamId is null
+  sentiment String // positive, negative, neutral
+  score Float
+  computedAt DateTime @default(now())
+
+  thread ForumThread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+  match Match? @relation(fields: [matchId], references: [id])
+  team Team? @relation(fields: [teamId], references: [id])
+
+  @@unique([threadId, targetKey])
+}

@@ -1,0 +1,14 @@
+.next
+node_modules
+npm-debug.log
+.env
+.env.local
+/.git
+/.gitignore
+logs
+dist
+coverage
+/.vercel
+Dockerfile
+docker-compose.yaml
+nginx/default.conf

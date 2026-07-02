@@ -1,0 +1,1098 @@
+openapi: 3.1.0
+info:
+  title: Prisma API
+  description: ""
+  version: 1.0.0
+paths: {}
+components:
+  schemas:
+    Media:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        url:
+          type: string
+        altText:
+          type: string
+        metadata:
+          type: object
+        uploadedById:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        uploadedBy:
+          $ref: "#/components/schemas/User"
+        userAvatar:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - url
+        - createdAt
+    Follow:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        followerId:
+          type: integer
+          format: int32
+        followeeId:
+          type: integer
+          format: int32
+        createdAt:
+          type: string
+          format: date-time
+        follower:
+          $ref: "#/components/schemas/User"
+        followee:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - followerId
+        - followeeId
+        - createdAt
+        - follower
+        - followee
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        email:
+          type: string
+        username:
+          type: string
+        displayName:
+          type: string
+        password:
+          type: string
+        authProvider:
+          $ref: "#/components/schemas/AuthProvider"
+        authProviderUserId:
+          type: string
+        role:
+          $ref: "#/components/schemas/Role"
+        favoriteTeamId:
+          type: integer
+          format: int32
+        avatarMediaId:
+          type: integer
+          format: int32
+        isBanned:
+          type: boolean
+        banUntil:
+          type: string
+          format: date-time
+        banReason:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        avatarMedia:
+          $ref: "#/components/schemas/Media"
+        mediaUploaded:
+          type: array
+          items:
+            $ref: "#/components/schemas/Media"
+        favoriteTeam:
+          $ref: "#/components/schemas/Team"
+        followers:
+          type: array
+          items:
+            $ref: "#/components/schemas/Follow"
+        following:
+          type: array
+          items:
+            $ref: "#/components/schemas/Follow"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        postEdits:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostEdit"
+        threads:
+          type: array
+          items:
+            $ref: "#/components/schemas/ForumThread"
+        createdPolls:
+          type: array
+          items:
+            $ref: "#/components/schemas/Poll"
+        pollVotes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PollVote"
+        generatedDigests:
+          type: array
+          items:
+            $ref: "#/components/schemas/DailyDigest"
+        reportsAuthored:
+          type: array
+          items:
+            $ref: "#/components/schemas/Report"
+        reportsReviewed:
+          type: array
+          items:
+            $ref: "#/components/schemas/Report"
+        bans:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ban"
+        bansPlaced:
+          type: array
+          items:
+            $ref: "#/components/schemas/Ban"
+        banAppeals:
+          type: array
+          items:
+            $ref: "#/components/schemas/BanAppeal"
+        decidedAppeals:
+          type: array
+          items:
+            $ref: "#/components/schemas/BanAppeal"
+        moderationActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ModerationAction"
+      required:
+        - id
+        - username
+        - password
+        - role
+        - isBanned
+        - createdAt
+        - mediaUploaded
+        - followers
+        - following
+        - posts
+        - postEdits
+        - threads
+        - createdPolls
+        - pollVotes
+        - generatedDigests
+        - reportsAuthored
+        - reportsReviewed
+        - bans
+        - bansPlaced
+        - banAppeals
+        - decidedAppeals
+        - moderationActions
+    TranslationCache:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        originalTextHash:
+          type: string
+        sourceLanguage:
+          type: string
+        targetLanguage:
+          type: string
+        translatedText:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+      required:
+        - id
+        - originalTextHash
+        - targetLanguage
+        - translatedText
+        - createdAt
+    Post:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        threadId:
+          type: integer
+          format: int32
+        authorId:
+          type: integer
+          format: int32
+        parentPostId:
+          type: integer
+          format: int32
+        content:
+          type: string
+        language:
+          type: string
+        isHidden:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        thread:
+          $ref: "#/components/schemas/ForumThread"
+        author:
+          $ref: "#/components/schemas/User"
+        parentPost:
+          $ref: "#/components/schemas/Post"
+        replies:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        edits:
+          type: array
+          items:
+            $ref: "#/components/schemas/PostEdit"
+        moderationVerdicts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiModerationVerdict"
+      required:
+        - id
+        - authorId
+        - content
+        - isHidden
+        - createdAt
+        - updatedAt
+        - author
+        - replies
+        - edits
+        - moderationVerdicts
+    Report:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        reporterId:
+          type: integer
+          format: int32
+        targetType:
+          $ref: "#/components/schemas/ReportTargetType"
+        targetId:
+          type: integer
+          format: int32
+        reasonCode:
+          $ref: "#/components/schemas/ReportReasonCode"
+        additionalComment:
+          type: string
+        reason:
+          type: string
+        status:
+          $ref: "#/components/schemas/ReportStatus"
+        createdAt:
+          type: string
+          format: date-time
+        reviewedAt:
+          type: string
+          format: date-time
+        reviewerId:
+          type: integer
+          format: int32
+        reporter:
+          $ref: "#/components/schemas/User"
+        reviewer:
+          $ref: "#/components/schemas/User"
+        aiVerdicts:
+          type: array
+          items:
+            $ref: "#/components/schemas/AiModerationVerdict"
+        moderationActions:
+          type: array
+          items:
+            $ref: "#/components/schemas/ModerationAction"
+      required:
+        - id
+        - targetType
+        - targetId
+        - reasonCode
+        - reason
+        - status
+        - createdAt
+        - aiVerdicts
+        - moderationActions
+    PostEdit:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        editorId:
+          type: integer
+          format: int32
+        previousContent:
+          type: string
+        language:
+          type: string
+        editedAt:
+          type: string
+          format: date-time
+        postId:
+          type: integer
+          format: int32
+        post:
+          $ref: "#/components/schemas/Post"
+        editor:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - previousContent
+        - editedAt
+        - postId
+        - post
+    Team:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        externalId:
+          type: string
+        name:
+          type: string
+        shortName:
+          type: string
+        slug:
+          type: string
+        tla:
+          type: string
+        crest:
+          type: string
+        address:
+          type: string
+        website:
+          type: string
+        founded:
+          type: integer
+          format: int32
+        clubColors:
+          type: string
+        venue:
+          type: string
+        area:
+          type: object
+        runningCompetitions:
+          type: object
+        coach:
+          type: object
+        marketValue:
+          type: integer
+          format: int32
+        squad:
+          type: object
+        staff:
+          type: object
+        lastUpdated:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        homeMatches:
+          type: array
+          items:
+            $ref: "#/components/schemas/Match"
+        awayMatches:
+          type: array
+          items:
+            $ref: "#/components/schemas/Match"
+        threads:
+          type: array
+          items:
+            $ref: "#/components/schemas/ForumThread"
+        fans:
+          type: array
+          items:
+            $ref: "#/components/schemas/User"
+        sentiments:
+          type: array
+          items:
+            $ref: "#/components/schemas/SentimentSummary"
+        standings:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamStanding"
+        seasonsWon:
+          type: array
+          items:
+            $ref: "#/components/schemas/Season"
+      required:
+        - id
+        - name
+        - createdAt
+        - updatedAt
+        - homeMatches
+        - awayMatches
+        - threads
+        - fans
+        - sentiments
+        - standings
+        - seasonsWon
+    Match:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        externalId:
+          type: string
+        homeTeamId:
+          type: integer
+          format: int32
+        awayTeamId:
+          type: integer
+          format: int32
+        homeScore:
+          type: integer
+          format: int32
+        awayScore:
+          type: integer
+          format: int32
+        status:
+          type: string
+        startTime:
+          type: string
+          format: date-time
+        endTime:
+          type: string
+          format: date-time
+        utcDate:
+          type: string
+          format: date-time
+        minute:
+          type: integer
+          format: int32
+        injuryTime:
+          type: integer
+          format: int32
+        attendance:
+          type: integer
+          format: int32
+        venue:
+          type: string
+        matchday:
+          type: integer
+          format: int32
+        stage:
+          type: string
+        group:
+          type: string
+        lastUpdated:
+          type: string
+          format: date-time
+        seasonId:
+          type: integer
+          format: int32
+        homeDetails:
+          type: object
+        awayDetails:
+          type: object
+        score:
+          type: object
+        goals:
+          type: object
+        penalties:
+          type: object
+        bookings:
+          type: object
+        substitutions:
+          type: object
+        odds:
+          type: object
+        referees:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        homeTeam:
+          $ref: "#/components/schemas/Team"
+        awayTeam:
+          $ref: "#/components/schemas/Team"
+        season:
+          $ref: "#/components/schemas/Season"
+        threads:
+          type: array
+          items:
+            $ref: "#/components/schemas/ForumThread"
+        sentiments:
+          type: array
+          items:
+            $ref: "#/components/schemas/SentimentSummary"
+      required:
+        - id
+        - homeTeamId
+        - awayTeamId
+        - status
+        - startTime
+        - createdAt
+        - updatedAt
+        - homeTeam
+        - awayTeam
+        - threads
+        - sentiments
+    Season:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        externalId:
+          type: integer
+          format: int32
+        startDate:
+          type: string
+          format: date-time
+        endDate:
+          type: string
+          format: date-time
+        currentMatchday:
+          type: integer
+          format: int32
+        winnerId:
+          type: integer
+          format: int32
+        winner:
+          $ref: "#/components/schemas/Team"
+        standings:
+          type: array
+          items:
+            $ref: "#/components/schemas/TeamStanding"
+        matches:
+          type: array
+          items:
+            $ref: "#/components/schemas/Match"
+      required:
+        - id
+        - startDate
+        - endDate
+        - standings
+        - matches
+    AiModerationVerdict:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        postId:
+          type: integer
+          format: int32
+        reportId:
+          type: integer
+          format: int32
+        verdict:
+          type: string
+        toxicityScore:
+          type: number
+          format: double
+        explanation:
+          type: string
+        contentSnapshot:
+          type: string
+        rawResponse:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        post:
+          $ref: "#/components/schemas/Post"
+        report:
+          $ref: "#/components/schemas/Report"
+      required:
+        - id
+        - postId
+        - verdict
+        - createdAt
+        - post
+    TeamStanding:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        seasonId:
+          type: integer
+          format: int32
+        teamId:
+          type: integer
+          format: int32
+        position:
+          type: integer
+          format: int32
+        played:
+          type: integer
+          format: int32
+        wins:
+          type: integer
+          format: int32
+        draws:
+          type: integer
+          format: int32
+        losses:
+          type: integer
+          format: int32
+        goalsFor:
+          type: integer
+          format: int32
+        goalsAgainst:
+          type: integer
+          format: int32
+        goalDifference:
+          type: integer
+          format: int32
+        points:
+          type: integer
+          format: int32
+        updatedAt:
+          type: string
+          format: date-time
+        season:
+          $ref: "#/components/schemas/Season"
+        team:
+          $ref: "#/components/schemas/Team"
+      required:
+        - id
+        - seasonId
+        - teamId
+        - position
+        - updatedAt
+        - team
+    DailyDigest:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        date:
+          type: string
+          format: date-time
+        generatedById:
+          type: integer
+          format: int32
+        content:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        generatedBy:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - date
+        - content
+        - createdAt
+        - updatedAt
+    ForumThread:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        title:
+          type: string
+        slug:
+          type: string
+        isClosed:
+          type: boolean
+        isHidden:
+          type: boolean
+        autoOpenAt:
+          type: string
+          format: date-time
+        autoCloseAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+        matchId:
+          type: integer
+          format: int32
+        teamId:
+          type: integer
+          format: int32
+        match:
+          $ref: "#/components/schemas/Match"
+        team:
+          $ref: "#/components/schemas/Team"
+        authorId:
+          type: integer
+          format: int32
+        author:
+          $ref: "#/components/schemas/User"
+        posts:
+          type: array
+          items:
+            $ref: "#/components/schemas/Post"
+        sentiments:
+          type: array
+          items:
+            $ref: "#/components/schemas/SentimentSummary"
+        tags:
+          type: array
+          items:
+            $ref: "#/components/schemas/Tag"
+        polls:
+          type: array
+          items:
+            $ref: "#/components/schemas/Poll"
+      required:
+        - id
+        - title
+        - isClosed
+        - isHidden
+        - createdAt
+        - updatedAt
+        - posts
+        - sentiments
+        - tags
+        - polls
+    Tag:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        name:
+          type: string
+        slug:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        threads:
+          type: array
+          items:
+            $ref: "#/components/schemas/ForumThread"
+      required:
+        - id
+        - name
+        - slug
+        - createdAt
+        - threads
+    Poll:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        threadId:
+          type: integer
+          format: int32
+        question:
+          type: string
+        createdById:
+          type: integer
+          format: int32
+        deadline:
+          type: string
+          format: date-time
+        isClosed:
+          type: boolean
+        createdAt:
+          type: string
+          format: date-time
+        thread:
+          $ref: "#/components/schemas/ForumThread"
+        createdBy:
+          $ref: "#/components/schemas/User"
+        options:
+          type: array
+          items:
+            $ref: "#/components/schemas/PollOption"
+        votes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PollVote"
+      required:
+        - id
+        - question
+        - createdById
+        - deadline
+        - isClosed
+        - createdAt
+        - createdBy
+        - options
+        - votes
+    PollOption:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        pollId:
+          type: integer
+          format: int32
+        label:
+          type: string
+        metadata:
+          type: object
+        poll:
+          $ref: "#/components/schemas/Poll"
+        votes:
+          type: array
+          items:
+            $ref: "#/components/schemas/PollVote"
+      required:
+        - id
+        - pollId
+        - label
+        - poll
+        - votes
+    PollVote:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        pollId:
+          type: integer
+          format: int32
+        optionId:
+          type: integer
+          format: int32
+        voterId:
+          type: integer
+          format: int32
+        votedAt:
+          type: string
+          format: date-time
+        poll:
+          $ref: "#/components/schemas/Poll"
+        option:
+          $ref: "#/components/schemas/PollOption"
+        voter:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - pollId
+        - optionId
+        - voterId
+        - votedAt
+        - poll
+        - option
+        - voter
+    ModerationAction:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        reportId:
+          type: integer
+          format: int32
+        actionType:
+          $ref: "#/components/schemas/ModerationActionType"
+        performedById:
+          type: integer
+          format: int32
+        details:
+          type: object
+        createdAt:
+          type: string
+          format: date-time
+        report:
+          $ref: "#/components/schemas/Report"
+        performedBy:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - actionType
+        - performedById
+        - createdAt
+        - performedBy
+    Ban:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        userId:
+          type: integer
+          format: int32
+        bannedById:
+          type: integer
+          format: int32
+        reason:
+          type: string
+        until:
+          type: string
+          format: date-time
+        liftedAt:
+          type: string
+          format: date-time
+        createdAt:
+          type: string
+          format: date-time
+        user:
+          $ref: "#/components/schemas/User"
+        bannedBy:
+          $ref: "#/components/schemas/User"
+        appeals:
+          type: array
+          items:
+            $ref: "#/components/schemas/BanAppeal"
+      required:
+        - id
+        - userId
+        - bannedById
+        - reason
+        - createdAt
+        - user
+        - bannedBy
+        - appeals
+    BanAppeal:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        banId:
+          type: integer
+          format: int32
+        userId:
+          type: integer
+          format: int32
+        message:
+          type: string
+        status:
+          $ref: "#/components/schemas/BanAppealStatus"
+        createdAt:
+          type: string
+          format: date-time
+        decidedAt:
+          type: string
+          format: date-time
+        decidedById:
+          type: integer
+          format: int32
+        ban:
+          $ref: "#/components/schemas/Ban"
+        user:
+          $ref: "#/components/schemas/User"
+        decidedBy:
+          $ref: "#/components/schemas/User"
+      required:
+        - id
+        - banId
+        - userId
+        - message
+        - status
+        - createdAt
+        - ban
+        - user
+    SentimentSummary:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int32
+        threadId:
+          type: integer
+          format: int32
+        matchId:
+          type: integer
+          format: int32
+        teamId:
+          type: integer
+          format: int32
+        scope:
+          type: string
+        targetKey:
+          type: string
+        sentiment:
+          type: string
+        score:
+          type: number
+          format: double
+        computedAt:
+          type: string
+          format: date-time
+        thread:
+          $ref: "#/components/schemas/ForumThread"
+        match:
+          $ref: "#/components/schemas/Match"
+        team:
+          $ref: "#/components/schemas/Team"
+      required:
+        - id
+        - threadId
+        - scope
+        - targetKey
+        - sentiment
+        - score
+        - computedAt
+        - thread
+    Role:
+      type: string
+      enum:
+        - USER
+        - ADMIN
+    AuthProvider:
+      type: string
+      enum:
+        - GOOGLE
+        - GITHUB
+    ReportTargetType:
+      type: string
+      enum:
+        - POST
+        - THREAD
+    ReportReasonCode:
+      type: string
+      enum:
+        - SPAM
+        - HARASSMENT
+        - HATE_SPEECH
+        - VIOLENCE
+        - SEXUAL_CONTENT
+        - MISINFORMATION
+        - OTHER
+        - SYSTEM_FLAGGED
+    ReportStatus:
+      type: string
+      enum:
+        - OPEN
+        - REVIEWED
+        - DISMISSED
+        - ACTIONED
+    BanAppealStatus:
+      type: string
+      enum:
+        - PENDING
+        - APPROVED
+        - DENIED
+    ModerationActionType:
+      type: string
+      enum:
+        - DISMISS
+        - HIDE
+        - BAN
+        - UNBAN
+  responses: {}
+  parameters: {}
+  examples: {}
+  requestBodies: {}
+  headers: {}
+  securitySchemes: {}
+  links: {}
+  callbacks: {}
+tags: []
+servers: []
