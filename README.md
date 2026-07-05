@@ -17,9 +17,17 @@ SportsDeck is a football (soccer) community platform built with Next.js. It comb
 
 ## Screenshots
 
+| Sign in | Create account |
+| --- | --- |
+| ![Sign in modal over a stadium background](sports-deck/public/images/screenshots/sign-in.png) | ![Sign up modal over a stadium background](sports-deck/public/images/screenshots/sign-up.png) |
+
 | Match detail & discussion | Profile & activity |
 | --- | --- |
 | ![Match detail page with AI sentiment analysis](sports-deck/public/images/screenshots/match-detail.png) | ![User profile page with activity chart](sports-deck/public/images/screenshots/profile.png) |
+
+| Edit profile |
+| --- |
+| ![Edit profile page with avatar, username, and favorite team](sports-deck/public/images/screenshots/edit-profile.png) |
 
 ## Tech stack
 
