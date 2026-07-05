@@ -1,5 +1,7 @@
 # WorldCupStop / SportsDeck
 
+**Live site:** [worldcupstop.ddns.net](https://worldcupstop.ddns.net/)
+
 SportsDeck is a football (soccer) community platform built with Next.js. It combines live competition data — matches, standings, teams, seasons — with a social layer: user profiles, follows, a personalized activity feed, and per-match/per-team discussion forums, backed by lightweight AI features for moderation, sentiment, and translation.
 
 ## Features
